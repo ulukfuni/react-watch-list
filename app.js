@@ -11,30 +11,36 @@ var WatchList = React.createClass({
 });
 
 var WatchListForm = React.createClass({
-  getInitialState: function() {
-    return {player: '', playerList: []};
-  },
   render: function() {
     return (
       <form className='watchlist-form'>
         <AutoCompleteInput />
-        <input type='submit' value='Post' />
       </form>
     );
   }
 });
 
 var AutoCompleteInput = React.createClass({
+  getInitialState: function(){
+    return {player: ''};
+  },
   componentDidMount: function(){
-    var url = 'http://stats.nba.com/stats/commonallplayers?IsOnlyCurrentSeason=1&LeagueID=00&Season=2015-16';
+    var url = 'http://stats.nba.com/stats/commonallplayers?IsOnlyCurrentSeason=1&LeagueID=00&Season=2015-16',
+    player; //TODO: make date proof
     this.serverRequest = $.get(url, function(data){
       var list = data.resultSets['0'].rowSet,
       playerList = [];
       for (var i in list) {
         playerList.push(list[i][2]);
       }
-      $(ReactDOM.findDOMNode(this)).autocomplete({source:playerList});
+      $(ReactDOM.findDOMNode(this)).autocomplete({
+        source: playerList,
+        select: function(event, ui){
+          player = ui.item.value;
+      }
+    });
     }.bind(this));
+    this.setState({player: player});
   },
   componentWillUnmount: function() {
     $(ReactDOM.findDOMNode(this)).autocomplete('destroy');
@@ -42,7 +48,7 @@ var AutoCompleteInput = React.createClass({
   },
   render: function(){
     return(
-      <input type='text' placeholder='Enter Player Name...' />
+      <input type='text' placeholder='Enter Player Name...' player={this.state.player} />
     );
   }
 });
