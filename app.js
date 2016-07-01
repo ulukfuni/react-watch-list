@@ -4,7 +4,7 @@ var WatchList = React.createClass({
       <div className='watch-list'>
         <h1>NBA Watch List</h1>
         I am the watch list!
-        <WatchListForm source={this.props.source}/>
+        <WatchListForm/>
       </div>
     );
   }
@@ -14,18 +14,35 @@ var WatchListForm = React.createClass({
   getInitialState: function() {
     return {player: '', playerList: []};
   },
-  componentDidMount: function () {
-    this.serverRequest = $.get(this.props.source, function(data){
-      var list = data.resultSets['0'].rowSet;
-      this.setState({player: '', playerList: list});
-    }.bind(this));
-  },
-  render: function() { console.log(this.state);
+  render: function() {
     return (
       <form className='watchlist-form'>
-        <input type='text' placeholder='Enter Player Name...' value={this.state.player} />
+        <AutoCompleteInput />
         <input type='submit' value='Post' />
       </form>
+    );
+  }
+});
+
+var AutoCompleteInput = React.createClass({
+  componentDidMount: function(){
+    var url = 'http://stats.nba.com/stats/commonallplayers?IsOnlyCurrentSeason=1&LeagueID=00&Season=2015-16';
+    this.serverRequest = $.get(url, function(data){
+      var list = data.resultSets['0'].rowSet,
+      playerList = [];
+      for (var i in list) {
+        playerList.push(list[i][2]);
+      }
+      $(ReactDOM.findDOMNode(this)).autocomplete({source:playerList});
+    }.bind(this));
+  },
+  componentWillUnmount: function() {
+    $(ReactDOM.findDOMNode(this)).autocomplete('destroy');
+    this.serverRequest.abort();
+  },
+  render: function(){
+    return(
+      <input type='text' placeholder='Enter Player Name...' />
     );
   }
 });
@@ -33,4 +50,4 @@ var WatchListForm = React.createClass({
 // var Player = React.createClass({});
 // var PlayerStats = React.createClass({});
 
-ReactDOM.render(<WatchList source='http://stats.nba.com/stats/commonallplayers?IsOnlyCurrentSeason=1&LeagueID=00&Season=2015-16'/>, document.getElementById('watch-list'))
+ReactDOM.render(<WatchList />, document.getElementById('watch-list'))
