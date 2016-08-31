@@ -96,13 +96,52 @@ var AutoCompleteInput = React.createClass({
   }
 });
 
-// var Player = React.createClass({});
 var PlayerStats = React.createClass({
   render: function() {
-    var gameLogs = this.props.stats;
+    var gameLogs = this.props.stats,
+    gameList = gameLogs.map(function(log, index){
+      return (
+      <tr key={index}>
+        <td>{index+1}</td>
+        <td>{log.field_goals_made} / {log.field_goals_attempted}</td>
+        <td>{log.free_throws_made} / {log.free_throws_attempted}</td>
+        <td>{log.three_pointers_made} / {log.three_pointers_attempted}</td>
+        <td>{log.points}</td>
+        <td>{log.rebounds_total}</td>
+        <td>{log.assists}</td>
+        <td>{log.steals}</td>
+        <td>{log.blocks}</td>
+        <td>{log.turnovers}</td>
+        <td>{log.plus_minus}</td>
+        <td>{log.personal_fouls}</td>
+        <td>{log.time_played_total /60}</td>
+      </tr>);
+      });
     if (this.props.show) {
       return (
-        <div className='game-logs'>{this.props.player}</div>
+        <div className='game-logs'>
+          <h3>{this.props.player}</h3>
+          <table className='stats-table'>
+            <thead>
+              <tr>
+                <th>index</th>
+                <th>Field Goals</th>
+                <th>Free Throws</th>
+                <th>3Pointers</th>
+                <th>Points</th>
+                <th>Rebounds</th>
+                <th>Assists</th>
+                <th>Steals</th>
+                <th>Blocks</th>
+                <th>Turnovers</th>
+                <th>Plus/Minus</th>
+                <th>Fouls</th>
+                <th>Minutes</th>
+              </tr>
+            </thead> 
+            <tbody>{gameList}</tbody>
+          </table>
+        </div>
       );
     }
     return (<div></div>);
