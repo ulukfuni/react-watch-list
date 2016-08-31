@@ -2,8 +2,12 @@ var WatchList = React.createClass({
   getInitialState: function() {
     return{
       player:'',
-      gamelogs: []
+      gamelogs: [],
+      showGameLogs: false
     };
+  },
+  showGameLogsDiv: function(val) {
+    this.setState({showGameLogs: val});
   },
   getPlayer: function(player) {
     this.setState({player: player}, this.getPlayerBoxScore(player)); 
@@ -27,13 +31,13 @@ var WatchList = React.createClass({
       }.bind(this),
     });
   },
-  render: function() { console.log(this.state.gamelogs);
+  render: function() {
     return (
       <div className='watch-list'>
         <h1>NBA Watch List</h1>
-        <p>{this.state.player}</p>
         <p className='change'>I am the watch list!</p>
-        <WatchListForm getplayer={this.getPlayer}/>
+        <WatchListForm getplayer={this.getPlayer} showGameLogs={this.showGameLogsDiv} />
+        <PlayerStats player={this.state.player} stats={this.state.gamelogs} show={this.state.showGameLogs} />
       </div>
     );
   }
@@ -41,12 +45,13 @@ var WatchList = React.createClass({
 
 var WatchListForm = React.createClass({
   propTypes: {
-    getplayer: React.PropTypes.func
+    getplayer: React.PropTypes.func,
+    showGameLogs: React.PropTypes.func
   },
   render: function() {
     return (
       <form className='watchlist-form'>
-        <AutoCompleteInput getplayer={this.props.getplayer}/>
+        <AutoCompleteInput getplayer={this.props.getplayer} showGameLogs={this.props.showGameLogs} />
       </form>
     );
   }
@@ -54,7 +59,8 @@ var WatchListForm = React.createClass({
 
 var AutoCompleteInput = React.createClass({
   propTypes: {
-    getplayer: React.PropTypes.func
+    getplayer: React.PropTypes.func,
+    showGameLogs: React.PropTypes.func
   },
   getInitialState: function(){
     return {player: ''};
@@ -74,6 +80,7 @@ var AutoCompleteInput = React.createClass({
         select: function(event, ui){
           player = ui.item.value;
           self.props.getplayer(player);
+          self.props.showGameLogs(true);
         }
       });
     }.bind(this));
@@ -90,6 +97,16 @@ var AutoCompleteInput = React.createClass({
 });
 
 // var Player = React.createClass({});
-// var PlayerStats = React.createClass({});
+var PlayerStats = React.createClass({
+  render: function() {
+    var gameLogs = this.props.stats;
+    if (this.props.show) {
+      return (
+        <div className='game-logs'>{this.props.player}</div>
+      );
+    }
+    return (<div></div>);
+  }
+});
 
 ReactDOM.render(<WatchList />, document.getElementById('watch-list'))
